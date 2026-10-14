@@ -235,7 +235,10 @@ a:hover {
 	padding: 60px 20px;
 	text-align: center;
 	position: relative;
+	/* The 700px logo watermark (.hero::after) must not widen the page, but the search suggestions have
+	   to hang below the hero, so clip sideways only. `hidden` stays as the fallback for old browsers. */
 	overflow: hidden;
+	overflow: clip visible;
 	box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3);
 	min-height: calc(75vh - 64px);
 	display: flex;
