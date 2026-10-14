@@ -1164,7 +1164,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Reset form
+            // Reset form (and drop any extra option a previous edit added for a stored value, see setVal)
+            modal.querySelectorAll('option[data-legacy]').forEach(o => o.remove());
             const form = modal.querySelector('form');
             if (form) form.reset();
 
@@ -1257,6 +1258,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function setVal(modal, selector, value) {
         const el = modal.querySelector(selector);
         if (!el || value === undefined || value === null) return;
+        // A <select> shows nothing, and then submits nothing, when the stored value is not one of its
+        // options (e.g. "Terbit" or "Selesai" from older data), so saving would overwrite it with NULL.
+        // Offer the stored value as an extra option so it is kept.
+        if (el.tagName === 'SELECT' && value !== '' && !Array.from(el.options).some(o => o.value === value)) {
+            const legacy = new Option(value, value);
+            legacy.dataset.legacy = '1';
+            el.add(legacy);
+        }
         el.value = value;
     }
 
