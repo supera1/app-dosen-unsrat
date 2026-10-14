@@ -1108,15 +1108,22 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ---- Tab switching ----
+    function showTab(name) {
+        const link = Array.from(document.querySelectorAll('.tab-link')).find(l => l.dataset.tab === name);
+        if (!link) return;
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        link.classList.add('active');
+        document.getElementById(name).classList.add('active');
+    }
     document.querySelectorAll('.tab-link').forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById(this.dataset.tab).classList.add('active');
+            showTab(this.dataset.tab);
         });
     });
+    // After a save or delete the controllers redirect to staff/{slug}#grants (etc.): open that tab.
+    if (location.hash) showTab(location.hash.slice(1));
 
     // ---- Modal helpers ----
     function openModal(id) {
