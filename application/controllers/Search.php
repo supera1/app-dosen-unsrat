@@ -9,6 +9,21 @@ class Search extends CI_Controller {
         $this->load->model('Staff_model');
     }
 
+    public function index()
+    {
+        $keyword = $this->input->get('q');
+        $keyword = is_string($keyword) ? trim($keyword) : '';
+
+        $data['title']    = ($keyword !== '' ? 'Pencarian: ' . $keyword : 'Pencarian Staf') . ' - UNSRAT';
+        $data['keyword']  = $keyword;
+        $data['searched'] = strlen($keyword) >= 2;
+        $data['results']  = $data['searched'] ? $this->Staff_model->search($keyword) : [];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('search/index', $data);
+        $this->load->view('templates/footer');
+    }
+
     public function suggest()
     {
         $keyword = trim($this->input->get('q') ?: '');
