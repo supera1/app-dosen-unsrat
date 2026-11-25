@@ -34,18 +34,51 @@ class Staff_model extends CI_Model {
         return $this->db->get()->row();
     }
 
-    public function search($keyword)
+    private function _apply_search_filter($keyword)
     {
-        $this->db->select('s.*, d.name as department_name, f.name as faculty_name');
-        $this->db->from('staff s');
-        $this->db->join('departments d', 'd.id = s.department_id');
-        $this->db->join('faculties f', 'f.id = d.faculty_id');
         $this->db->group_start();
             $this->db->like('s.name', $keyword);
             $this->db->or_like('s.nip', $keyword);
             $this->db->or_like('s.expertise', $keyword);
         $this->db->group_end();
+    }
+
+    public function count_search($keyword)
+    {
+        $this->db->from('staff s');
+        $this->_apply_search_filter($keyword);
+        return (int) $this->db->count_all_results();
+    }
+
+    public function search($keyword, $limit = null, $offset = 0)
+    {
+        $this->db->select('s.*, d.name as department_name, f.name as faculty_name');
+        $this->db->from('staff s');
+        $this->db->join('departments d', 'd.id = s.department_id');
+        $this->db->join('faculties f', 'f.id = d.faculty_id');
+        $this->_apply_search_filter($keyword);
+
+        // Relevance: exact name, name prefix, name contains, NIP, expertise, others.
+        $escaped = $this->db->escape_like_str($keyword);
+        $exact   = $this->db->escape($keyword);
+        $this->db->order_by(
+            "CASE
+                WHEN s.name = {$exact} THEN 0
+                WHEN s.name LIKE '{$escaped}%' THEN 1
+                WHEN s.name LIKE '%{$escaped}%' THEN 2
+                WHEN s.nip LIKE '%{$escaped}%' THEN 3
+                WHEN s.expertise LIKE '%{$escaped}%' THEN 4
+                ELSE 5
+            END",
+            '',
+            FALSE
+        );
         $this->db->order_by('s.name', 'ASC');
+
+        if ($limit !== null) {
+            $this->db->limit((int) $limit, (int) $offset);
+        }
+
         return $this->db->get()->result();
     }
 

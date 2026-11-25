@@ -1420,3 +1420,39 @@ a:hover {
     text-decoration: underline;
     color: var(--accent, #e8a817);
 }
+
+/* ---------- Pagination (search results) ---------- */
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 32px 0 8px;
+}
+.pagination a,
+.pagination .current {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 10px;
+	border: 1.5px solid var(--gray-200);
+	border-radius: 6px;
+	background: var(--white);
+	color: var(--gray-700);
+	font-weight: 600;
+	font-size: 0.85rem;
+	text-decoration: none;
+	transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.pagination a:hover {
+	border-color: var(--primary);
+	color: var(--primary);
+}
+.pagination .current {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: var(--white);
+}
